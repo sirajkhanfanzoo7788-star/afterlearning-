@@ -3,7 +3,7 @@ const app = express();
 
 // Simple route
 app.get('/', (req, res) => {
-    res.send('Hello from AfterLearning CI/CD Pipeline!');
+    res.send('Testing CI/CD pipeline push! CI/CD Pipeline!');
 });
 
 // Listen on port 3000

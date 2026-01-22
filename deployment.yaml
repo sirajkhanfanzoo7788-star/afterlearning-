@@ -1,0 +1,26 @@
+# Step 1: API version and kind (covered)
+apiVersion: apps/v1
+kind: Deployment
+
+# Step 2: Metadata (covered)
+metadata:
+  name: afterlearning   # Deployment name (friendly)
+
+# Step 3: Spec (covered)
+spec:
+  replicas: 1                       # Number of pods (covered)
+  selector:
+    matchLabels:
+      app: afterlearning              # App label (covered)
+
+# Step 4: Template (hanging, next to learn)
+  template:
+    metadata:
+      labels:
+        app: afterlearning         # MUST match selector
+    spec:
+      containers:
+      - name: afterlearning            # Container name (friendly)
+        image: sirajahmad77/afterlearning:tagname # Docker image (covered)
+        ports:
+        - containerPort: 3000       # Port Node app listens on (next to learn fully)

@@ -1,0 +1,17 @@
+apiVersion: v1                  # 🔒 KEEP – almost always the same
+kind: Service                   # 🔒 KEEP – defines this as a Service
+
+metadata:
+  name: afterlearning-service          # 🔁 CHANGE – service name (project-based)
+
+spec:
+  selector:
+    app: afterlearning               # 🔁 CHANGE – MUST match Deployment label
+
+  type: NodePort                # 🔒 KEEP (or change to LoadBalancer in cloud)
+
+  ports:
+    - protocol: TCP             # 🔒 KEEP – almost always TCP
+      port: 3000                # 🔁 CHANGE – service port (your app port)
+      targetPort: 3000          # 🔁 CHANGE – containerPort in Deployment
+      nodePort: 32000           # 🔁 CHANGE – optional, must be 30000–32767

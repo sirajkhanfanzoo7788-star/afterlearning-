@@ -5,7 +5,8 @@ pipeline {
         DOCKERHUB_USER = "sirajahmad77"
         IMAGE_NAME     = "afterlearning"
         IMAGE_TAG      = "${BUILD_NUMBER}"
-        KUBECONFIG     = "C:\\Users\\M SIRAJ RAHIM\\.kube\\config"  // Minikube kubeconfig path
+        // Wrap path in quotes to handle spaces in Windows
+        KUBECONFIG     = '"C:\\Users\\M SIRAJ RAHIM\\.kube\\config"'
     }
 
     stages {
@@ -44,7 +45,7 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                // Make Jenkins use your Minikube kubeconfig
+                // Wrap %KUBECONFIG% in quotes to handle spaces
                 bat "kubectl --kubeconfig=%KUBECONFIG% apply -f deployment.yaml"
                 bat "kubectl --kubeconfig=%KUBECONFIG% apply -f service.yaml"
             }

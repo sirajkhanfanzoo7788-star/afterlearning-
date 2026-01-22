@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_USER = "sirajahmad"
+        DOCKERHUB_USER = "sirajahmad77"
         IMAGE_NAME     = "afterlearning"
         IMAGE_TAG      = "${BUILD_NUMBER}"
     }
@@ -11,7 +11,8 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat "docker build -t %DOCKERHUB_USER%/%IMAGE_NAME%:%IMAGE_TAG% ."
+                // Use env variables
+                bat "docker build -t ${env.DOCKERHUB_USER}/${env.IMAGE_NAME}:${env.IMAGE_TAG} ."
             }
         }
 
@@ -19,19 +20,20 @@ pipeline {
             steps {
                 withCredentials([
                     usernamePassword(
-                        credentialsId: 'dockerhub-creds',
-                        usernameVariable: 'DOCKER_USER',
+                        credentialsId: 'dockerhub-creds', 
+                        usernameVariable: 'DOCKER_USER', 
                         passwordVariable: 'DOCKER_PASS'
                     )
                 ]) {
-                    bat "docker login -u %DOCKER_USER% -p %DOCKER_PASS%"
+                    // Secure login
+                    bat "echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin"
                 }
             }
         }
 
         stage('Push Image') {
             steps {
-                bat "docker push %DOCKERHUB_USER%/%IMAGE_NAME%:%IMAGE_TAG%"
+                bat "docker push ${env.DOCKERHUB_USER}/${env.IMAGE_NAME}:${env.IMAGE_TAG}"
             }
         }
 

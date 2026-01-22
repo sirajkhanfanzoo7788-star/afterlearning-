@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: afterlearning
-        image: sirajahmad77/afterlearning:BUILD_NUMBER  # Jenkins will replace BUILD_NUMBER
+        image: sirajahmad77/afterlearning:17  # Hardcoded latest build number
         imagePullPolicy: Always
         ports:
         - containerPort: 3000

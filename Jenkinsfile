@@ -5,14 +5,20 @@ pipeline {
         DOCKERHUB_USER = "sirajahmad77"
         IMAGE_NAME     = "afterlearning"
         IMAGE_TAG      = "${BUILD_NUMBER}"
+        KUBECONFIG     = "C:\\Users\\M SIRAJ RAHIM\\.kube\\config"  // Minikube kubeconfig path
     }
 
     stages {
 
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
-                // Use env variables
-                bat "docker build -t ${env.DOCKERHUB_USER}/${env.IMAGE_NAME}:${env.IMAGE_TAG} ."
+                bat "docker build -t %DOCKERHUB_USER%/%IMAGE_NAME%:%IMAGE_TAG% ."
             }
         }
 
@@ -20,27 +26,27 @@ pipeline {
             steps {
                 withCredentials([
                     usernamePassword(
-                        credentialsId: 'dockerhub-creds', 
-                        usernameVariable: 'DOCKER_USER', 
+                        credentialsId: 'dockerhub-creds',
+                        usernameVariable: 'DOCKER_USER',
                         passwordVariable: 'DOCKER_PASS'
                     )
                 ]) {
-                    // Secure login
-                    bat "echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin"
+                    bat "echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin"
                 }
             }
         }
 
-        stage('Push Image') {
+        stage('Push Docker Image') {
             steps {
-                bat "docker push ${env.DOCKERHUB_USER}/${env.IMAGE_NAME}:${env.IMAGE_TAG}"
+                bat "docker push %DOCKERHUB_USER%/%IMAGE_NAME%:%IMAGE_TAG%"
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                bat "kubectl apply -f deployment.yaml"
-                bat "kubectl apply -f service.yaml"
+                // Make Jenkins use your Minikube kubeconfig
+                bat "kubectl --kubeconfig=%KUBECONFIG% apply -f deployment.yaml"
+                bat "kubectl --kubeconfig=%KUBECONFIG% apply -f service.yaml"
             }
         }
     }

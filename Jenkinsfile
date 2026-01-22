@@ -21,7 +21,9 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                bat "(Get-Content deployment.yaml) -replace 'BUILD_NUMBER', '%BUILD_TAG%' | Set-Content deployment_temp.yaml"
+                // Run this step in PowerShell so -replace works
+                powershell "(Get-Content deployment.yaml) -replace 'BUILD_NUMBER', '${BUILD_TAG}' | Set-Content deployment_temp.yaml"
+
                 bat "kubectl apply -f deployment_temp.yaml"
             }
         }

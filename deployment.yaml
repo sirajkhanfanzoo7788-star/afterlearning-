@@ -1,23 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
-
 metadata:
-  name: afterlearning
-
+  name: afterlearning-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: afterlearning
-
   template:
     metadata:
       labels:
         app: afterlearning
     spec:
       containers:
-        - name: afterlearning
-          image: sirajahmad77/afterlearning:latest
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 3000
+      - name: afterlearning
+        image: sirajahmad77/afterlearning:BUILD_NUMBER  # Jenkins will replace BUILD_NUMBER
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000

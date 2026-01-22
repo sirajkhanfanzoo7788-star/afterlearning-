@@ -2,52 +2,30 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_USER = "sirajahmad77"
-        IMAGE_NAME     = "afterlearning"
-        IMAGE_TAG      = "${BUILD_NUMBER}"
-        // Wrap path in quotes to handle spaces in Windows
-        KUBECONFIG     = '"C:\\Users\\M SIRAJ RAHIM\\.kube\\config"'
+        IMAGE_NAME = "sirajahmad77/afterlearning"
+        BUILD_TAG = "${BUILD_NUMBER}"  // Jenkins build number as Docker tag
     }
 
     stages {
-
-        stage('Checkout Code') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
-                bat "docker build -t %DOCKERHUB_USER%/%IMAGE_NAME%:%IMAGE_TAG% ."
-            }
-        }
-
-        stage('Login to Docker Hub') {
-            steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'dockerhub-creds',
-                        usernameVariable: 'DOCKER_USER',
-                        passwordVariable: 'DOCKER_PASS'
-                    )
-                ]) {
-                    bat "echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin"
-                }
+                bat "docker build -t %IMAGE_NAME%:%BUILD_TAG% ."
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                bat "docker push %DOCKERHUB_USER%/%IMAGE_NAME%:%IMAGE_TAG%"
+                bat "docker push %IMAGE_NAME%:%BUILD_TAG%"
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                // Wrap %KUBECONFIG% in quotes to handle spaces
-                bat "kubectl --kubeconfig=%KUBECONFIG% apply -f deployment.yaml"
-                bat "kubectl --kubeconfig=%KUBECONFIG% apply -f service.yaml"
+                // Replace BUILD_NUMBER in YAML with actual tag (Windows syntax)
+                bat "(Get-Content deployment.yaml) -replace 'BUILD_NUMBER', '%BUILD_TAG%' | Set-Content deployment_temp.yaml"
+
+                // Apply the updated YAML
+                bat "kubectl apply -f deployment_temp.yaml"
             }
         }
     }
